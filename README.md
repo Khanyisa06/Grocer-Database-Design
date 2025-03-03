@@ -3,12 +3,12 @@
   ## *Table of Contents*
  
  1. __INTRODUCTION__
-   - [Overview](#overview)
-   - [Project Scenario](#project-scenario)
-   - [Project Objectives](#project-objectives)
-   -  [My Task](#my-task)
-   - [Skills](#skills)
-  - [Project Tools](#project-tools)
+     - [Overview](#overview)
+     - [Project Scenario](#project-scenario)
+     - [Project Objectives](#project-objectives)
+     -  [My Task](#my-task)
+     - [Skills](#skills)
+     - [Project Tools](#project-tools)
  2. __BUILD MY PROJECT__
    - [Database Design Analysis: ](#database-design-analysis)
 
@@ -189,8 +189,7 @@ __EXTENDED ENTITY RELATION DIAGRAM__
 
 ## Database Testing
 
-Once I’ve created the ERD and built the database, I’ll start by inserting the data from the flat file into the newly created tables. After that, I’ll test the relationships between the tables using a variety of SQL queries. First, I’ll demonstrate that I can retrieve data from every table in the database with just one query, tying everything together seamlessly. Then, I’ll write one or more queries that show how I can join tables together, including the SQL code to prove it works. Finally, queries that answers a real business question—like whether I can pull all the data needed to create a purchase order in a single go—showing how SQL can solve practical problems.
-
+Once I’ve created the ERD and built the database, I’ll start by inserting the data from the flat file into the newly created tables. After that, I’ll test the relationships between the tables using a variety of SQL queries. First, I’ll demonstrate that I can retrieve data from every table in the database with just one query. Then, I’ll write one or more queries that show how I can join tables together, including the SQL code to prove it works. Finally, queries that answers bussiness questions  to prove that it works
 1. __Insert data from the csv into the created database tables__
 
 ``` sql
@@ -284,12 +283,65 @@ VALUES
 
 
 
+2. __Join tables together__ 
+
+ ``` sql
+      i.Item_Num,
+    i.Item_Description,
+    i.Item_Type,
+    i.Location,
+    i.unit,
+    p.Purchases_ID,
+    p.Quantity_on_Hand AS Purchase_Quantity_On_Hand,
+    p.Cost,
+    p.Purchase_Date,
+    p.Quantity_Bought,
+    s.Sales_ID,
+     c.Customer_ID,
+    s.Quantity_on_Hand AS Sales_Quantity_On_Hand,
+    s.Price,
+    s.Date_Sold,
+    s.Quantity_Sold,
+    v.Vendor_ID,
+    v.Vendor_Name,
+    v.Address
+FROM sales s
+JOIN customers c ON s.Customers_Customer_ID = c.Customer_ID
+JOIN items i ON s.Items_Item_Num = i.Item_Num
+LEFT JOIN purchases p ON i.Item_Num = p.Items_Item_Num
+LEFT JOIN vendors v ON p.Vendors_Vendor_ID = v.Vendor_ID;
+```
+3. __Write queries to answer business questions__
+
+Which Items are running low and need restocking
 
  
 
+Which products are overstocked and tying up capital?
+Why: Frees up resources by identifying slow-moving items for discounts or reduced ordering.
+SQL: SELECT ProductName, StockQuantity FROM Products WHERE StockQuantity > 100 ORDER BY StockQuantity DESC;
+
+What’s the total value of our current inventory?
+Why: Helps assess financial health and plan purchasing budgets.
+SQL: SELECT SUM(Price * StockQuantity) AS TotalInventoryValue FROM Products;
 
 
-2. __Join tables together__ 
+Which products are the top sellers by volume or revenue?
+Why: Highlights popular items to prioritize in marketing or stock planning.
+SQL (Volume): SELECT p.ProductName, SUM(s.QuantitySold) AS TotalSold FROM Products p JOIN Sales s ON p.ProductID = s.ProductID GROUP BY p.ProductName ORDER BY TotalSold DESC LIMIT 5;
+
+
+SQL (Revenue): SELECT p.ProductName, SUM(s.QuantitySold * p.Price) AS TotalRevenue FROM Products p JOIN Sales s ON p.ProductID = s.ProductID GROUP BY p.ProductName ORDER BY TotalRevenue DESC LIMIT 5;
+
+Which categories are driving the most sales?
+Why: Guides category expansion or layout decisions for the online store.
+SQL: SELECT c.CategoryName, SUM(s.QuantitySold) AS TotalSold FROM Categories c JOIN Products p ON c.CategoryID = p.CategoryID JOIN Sales s ON p.ProductID = s.ProductID GROUP BY c.CategoryName ORDER BY TotalSold DESC;
+
+Who are our most frequent or highest-spending customers?
+Why: Identifies loyal customers for targeted promotions or loyalty programs.
+SQL: SELECT c.CustomerName, COUNT(s.SaleID) AS PurchaseCount, SUM(s.QuantitySold * p.Price) AS TotalSpent FROM Customers c JOIN Sales s ON c.CustomerID = s.CustomerID JOIN Products p ON s.ProductID = p.ProductID GROUP BY c.CustomerName ORDER BY TotalSpent DESC LIMIT 5;
+
+
 
 
 
