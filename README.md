@@ -10,7 +10,9 @@
      - [Skills](#skills)
      - [Project Tools](#project-tools)
  2. __BUILD MY PROJECT__
-   - [Database Design Analysis: ](#database-design-analysis)
+    - [Database Design Analysis ](#database-design-analysis)
+    - [Database Testing](#database-testing)
+    - [Insights and Conclusions](#insights-and-conclusions)
 
 ## Overview
 
@@ -313,35 +315,139 @@ LEFT JOIN vendors v ON p.Vendors_Vendor_ID = v.Vendor_ID;
 ```
 3. __Write queries to answer business questions__
 
-Which Items are running low and need restocking
+Which items are running low and need restocking, and which products are overstocked and tying up capital?
+``` sql
 
- 
+SELECT  Item_Description, Item_Type , Quantity_on_Hand from mydb.items 
+join 
+sales  on Items_Item_Num=Item_Num
+where Quantity_on_Hand < 10 ORDER BY  Quantity_on_Hand ASC;
 
-Which products are overstocked and tying up capital?
-Why: Frees up resources by identifying slow-moving items for discounts or reduced ordering.
-SQL: SELECT ProductName, StockQuantity FROM Products WHERE StockQuantity > 100 ORDER BY StockQuantity DESC;
+
+SELECT  Item_Description, Item_Type , Quantity_on_Hand from mydb.items 
+join 
+sales  on Items_Item_Num=Item_Num
+where Quantity_on_Hand > 30 ORDER BY  Quantity_on_Hand DESC;
+
+```
+
 
 What’s the total value of our current inventory?
-Why: Helps assess financial health and plan purchasing budgets.
-SQL: SELECT SUM(Price * StockQuantity) AS TotalInventoryValue FROM Products;
+``` sql
 
+SELECT SUM(Price *  Quantity_on_Hand) AS TotalInventoryValue FROM mydb.sales;
+```
 
 Which products are the top sellers by volume or revenue?
-Why: Highlights popular items to prioritize in marketing or stock planning.
-SQL (Volume): SELECT p.ProductName, SUM(s.QuantitySold) AS TotalSold FROM Products p JOIN Sales s ON p.ProductID = s.ProductID GROUP BY p.ProductName ORDER BY TotalSold DESC LIMIT 5;
+```sql
 
+ SELECT 
+ Item_Description, SUM(Quantity_Sold) AS TotalSold
+FROM
+    mydb.items
+        JOIN
+    Sales  ON  Items_Item_Num =  Item_Num
+GROUP BY  Item_Description
+ORDER BY TotalSold DESC
+LIMIT 5;
 
-SQL (Revenue): SELECT p.ProductName, SUM(s.QuantitySold * p.Price) AS TotalRevenue FROM Products p JOIN Sales s ON p.ProductID = s.ProductID GROUP BY p.ProductName ORDER BY TotalRevenue DESC LIMIT 5;
+-- Revenue
 
-Which categories are driving the most sales?
-Why: Guides category expansion or layout decisions for the online store.
-SQL: SELECT c.CategoryName, SUM(s.QuantitySold) AS TotalSold FROM Categories c JOIN Products p ON c.CategoryID = p.CategoryID JOIN Sales s ON p.ProductID = s.ProductID GROUP BY c.CategoryName ORDER BY TotalSold DESC;
+ SELECT 
+ Item_Description, SUM(Quantity_Sold* Price) AS TotalSold
+FROM
+    mydb.items
+        JOIN
+    Sales  ON  Items_Item_Num =  Item_Num
+GROUP BY  Item_Description
+ORDER BY TotalSold DESC
+LIMIT 5;
+
+```
+
+Which most items are bought
+
+``` sql
+
+ SELECT 
+    Vendors_Vendor_ID, 
+    Vendor_Name, 
+    COUNT(Items_Item_Num) AS Total_Items_Bought
+FROM purchases 
+JOIN vendors  ON Vendors_Vendor_ID = Vendor_ID
+GROUP BY Vendors_Vendor_ID, Vendor_Name
+ORDER BY Total_Items_Bought DESC
+LIMIT 1;
+```
+ 
+ 
 
 Who are our most frequent or highest-spending customers?
-Why: Identifies loyal customers for targeted promotions or loyalty programs.
-SQL: SELECT c.CustomerName, COUNT(s.SaleID) AS PurchaseCount, SUM(s.QuantitySold * p.Price) AS TotalSpent FROM Customers c JOIN Sales s ON c.CustomerID = s.CustomerID JOIN Products p ON s.ProductID = p.ProductID GROUP BY c.CustomerName ORDER BY TotalSpent DESC LIMIT 5;
+ ```sql
 
 
+SELECT 
+    c.Customer_ID, 
+    COUNT(s.Sales_ID) AS PurchaseCount, 
+    SUM(s.Quantity_Sold * s.Price) AS TotalSpent
+FROM customers c
+JOIN sales s ON c.Customer_ID = s.Customers_Customer_ID
+JOIN items i ON s.Items_Item_Num = i.Item_Num
+GROUP BY c.Customer_ID
+ORDER BY TotalSpent DESC
+LIMIT 5;
+```
+
+
+ ## Insights and Conclusions
+
+__Explanation of How the Database Design Addresses Issues that Grocer had__
+
+Eliminating Redundancy  
+Separate tables store each entity once (e.g., Suppliers table holds "Fresh Farms" linked to products via SupplierID).  
+
+Benefit: Reduces duplication and centralizes updates (e.g., changing a supplier’s phone number in one place).
+
+Handling Missing Data  
+During Excel cleanup, gaps were addressed (e.g., missing stock set to 0, incomplete entries flagged) before MySQL import.  
+
+Solution: Schema enforces required fields (e.g., NOT NULL on ProductName or Price) to prevent future missing data.
+
+Standardizing Formatting  
+Data normalized in Excel before import (e.g., prices as decimals like 3.99, dates as YYYY-MM-DD).  
+
+Enforcement: MySQL column types (e.g., DECIMAL for prices, DATE for dates) ensure ongoing consistency.
+
+Establishing Relationships  
+Foreign keys (e.g., CategoryID in Products linking to Categories) create logical, enforceable connections.  
+
+Advantage: Enables efficient joins for analysis, replacing manual lookups in the flat spreadsheet.
+
+Enforcing Integrity and Scalability  
+Primary keys (e.g., ProductID) prevent duplicates, ensuring data integrity.  
+
+Scalability: The relational model supports growth—new products or suppliers can be added without restructuring.
+
+
+
+__How does the Database Design Support Business Growth__
+
+ The database is designed to handle more data smoothly and is easily adaptable as the business expands.
+
+Scalability – The relational structure allows for seamless addition of new products, vendors, and customers without major modifications. Indexed keys and optimized queries ensure performance remains stable as data volume increases.
+
+Flexibility – The separation of items, purchases, sales, and vendors ensures that new product categories can be introduced without disrupting existing records. The JOIN-based relationships allow easy reporting and tracking across various product lines.
+
+Data Integrity – Foreign keys and constraints maintain accurate relationships, preventing data inconsistencies as more transactions occur.
+
+Efficient Analysis – The design supports trend analysis, stock management, and customer insights, enabling informed decision-making as the business scales.
+
+__Future Enhancements for a More Valuable Database__
+
+Supplier Relationship Management – Expanding the Vendors table to include contact details, payment terms, and performance ratings will improve vendor management
+
+ ustomer Profiles and Loyalty Tracking
+Expanding the Customers table to include CustomerID, CustomerName, Email, and Address will enable personalized marketing and efficient delivery logistics. This enhances customer engagement, supports loyalty programs, and improves retention as the business scales
 
 
 
