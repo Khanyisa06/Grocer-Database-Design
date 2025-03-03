@@ -180,12 +180,118 @@ __Benefits of the Relational Design__
 4. __Scalability:__ Queries (e.g., total sales per item) become faster and more efficient using relational joins.
 5. ___Consistency:__ Standardized fields (e.g., Unit) can be enforced at the database level.
 
+__EXTENDED ENTITY RELATION DIAGRAM__
+   - To create it I used mySQL Data Modelling tool
+
+ ![EXTENDED ENTITY RELATION DIAGRAM](https://github.com/user-attachments/assets/6c53aa2c-8ff9-456c-a170-d3f718497618)
+
+
 
 ## Database Testing
 
-Once I’ve created the Extended Entity Relation Diagram and built the database, I’ll need to test the relationships between the tables using a variety of SQL queries. I’ll make sure to include a few specific things in this process. 
+Once I’ve created the ERD and built the database, I’ll start by inserting the data from the flat file into the newly created tables. After that, I’ll test the relationships between the tables using a variety of SQL queries. First, I’ll demonstrate that I can retrieve data from every table in the database with just one query, tying everything together seamlessly. Then, I’ll write one or more queries that show how I can join tables together, including the SQL code to prove it works. Finally, queries that answers a real business question—like whether I can pull all the data needed to create a purchase order in a single go—showing how SQL can solve practical problems.
 
-1. First, I’ll write one or more queries that show how I can join tables together, complete with the SQL code to back it up. Next, I’ll craft at least one query that proves SQL can tackle a real business question—for instance, can I pull together all the data needed to generate a purchase order in a single query? Finally, I’ll demonstrate that I can retrieve data from every table in the database with just one query, tying everything together seamlessly.
+1. __Insert data from the csv into the created database tables__
+
+``` sql
+-- INSERTING DATA INTO ITEMS TABLE
+
+INSERT INTO mydb.items (Item_Num, Description, Item_Type, Location, Unit)
+VALUES
+(1000, 'Bennet Farm free-range eggs', 'Dairy', 'D12', 'dozen'),
+(1100, 'Freshness White beans', 'Canned', 'a2', '12 oz can'),
+(1222, 'Freshness Green beans', 'Canned', 'a3', '12-oz can'),
+(1223, 'Freshness Green beans', 'Canned', 'a7', '36 oz can'),
+(1224, 'Freshness Wax beans', 'Canned', 'a3', '12-oz can'),
+(2000, 'Ruby''s Kale', 'Produce', 'p12', 'bunch'),
+(2001, 'Ruby''s Organic Kale', 'Produce', 'po2', 'bunch');
+
+--INSERTING DATA INTO VENDORS TABLE
+
+INSERT INTO mydb.vendors (Vendor_ID, Vendor_Name, Vendor_Address)
+VALUES
+('V001', 'Bennet Farms', 'Rt. 17 Evansville, IL 55446'),
+('V002', 'Freshness, Inc.', '202 E. Maple St., St. Joseph, MO 45678'),
+('V003', 'Ruby Redd Produce, LLC', '1212 Milam St., Kenosha, AL 34567');
+
+-- INSERTING DATA INTO CUSTOMERS TABLE
+
+INSERT INTO mydb.customers (Customer_ID)
+VALUES
+(198765),
+(202900),
+(196777),
+(277177),
+(111000),
+(100988);
+
+-- INSERTING DATA INTO SALES TABLE, 0 IS USED FOR NULL CUSTOMER IDs
+
+INSERT INTO mydb.sales (Item_Num, Customer_ID, Quantity_On_Hand, Price, Date_Sold, Quantity_Sold)
+VALUES
+(1000, 198765, 27, 5.49, '2022-02-02', 2),
+(2000, 0, 3, 3.99, '2022-02-02', 2),
+(1100, 202900, 13, 1.49, '2022-02-02', 2),
+(1000, 196777, 25, 5.99, '2022-02-04', 2),
+(1100, 198765, 45, 1.49, '2022-02-07', 8),
+(1000, 277177, 21, 5.49, '2022-02-11', 4),
+(1100, 0, 41, 1.49, '2022-02-11', 4),
+(1222, 111000, 47, 1.29, '2022-02-12', 12),
+(1224, 0, 23, 1.55, '2022-02-12', 8),
+(1223, 198765, 7, 3.49, '2022-02-13', 5),
+(2001, 100988, 19, 6.99, '2022-02-13', 1),
+(2001, 202900, 7, 6.99, '2022-02-14', 12),
+(2000, 111000, 26, 3.99, '2022-02-15', 2);
+
+
+--INSERTING DATA INTO PURCHASES TABLE
+
+INSERT INTO mydb.purchases (Vendor_ID, Item_Num, Quantity_On_Hand, Cost, Purchase_Date, Quantity_Purchased)
+VALUES
+('V001', 1000, 29, 2.35, '2022-02-01', 25),
+('V002', 1100, 53, 0.69, '2022-02-02', 40),
+('V002', 1222, 59, 0.59, '2022-02-10', 40),
+('V002', 1223, 12, 1.75, '2022-02-10', 10),
+('V002', 1224, 31, 0.65, '2022-02-10', 30),
+('V003', 2000, 28, 1.29, '2022-02-12', 25),
+('V003', 2001, 20, 2.19, '2022-02-12', 20),
+('V002', 1223, 17, 1.8, '2022-02-15', 10);
+
+```
+
+2. __Retrieve data from every table in the database__
+
+- *__Retreive from items Table__*
+
+![Screenshot (99)](https://github.com/user-attachments/assets/5295e69e-f7cb-4d33-8f6e-809a392bd8eb)
+
+ 
+-  *__Retreive from vendors Table__*
+
+![Screenshot (100)](https://github.com/user-attachments/assets/7f65bf3c-5453-41b9-871f-089832a9c92e)
+
+-  *__Retreive from customers Table__*
+
+![Screenshot (102)](https://github.com/user-attachments/assets/5251db77-77cf-40e0-9274-0f80d9e15019)
+
+-  *__Retreive from sales Table__*
+
+![Screenshot (103)](https://github.com/user-attachments/assets/0e50e5d2-bd6a-4637-a1ba-b33219d0e47b)
+
+-  *__Retreive from purchases Table__*
+    
+![Screenshot (104)](https://github.com/user-attachments/assets/5a02a151-19ad-4e3b-8642-b5033c7b5091)
+
+
+
+
+ 
+
+
+
+2. __Join tables together__ 
+
+
 
 
  
