@@ -2,12 +2,14 @@
 
   ## *Table of Contents*
  
-1. [Overview](#overview)
-2. [Project Scenario](#project-scenario)
-3. [Project Objectives](#project-objectives)
-4. [My Task](#my-task)
-5. [Skills](#skills)
-6. [Project Tools](#project-tools)
+ 1. __INTRODUCTION__
+   - [Overview](#overview)
+   - [Project Scenario](#project-scenario)
+   - [Project Objectives](#project-objectives)
+   -  [My Task](#my-task)
+   - [Skills](#skills)
+  - [Project Tools](#project-tools)
+ 2. __BUILD MY PROJECT__
  
 
 ## Overview
